@@ -1,0 +1,16 @@
+{
+    "name": "yangyifan/model-helper",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "yangyifan",
+            "email": "yangyifanphp@gmail.com"
+        }
+    ],
+    "require": {},
+  "autoload": {
+    "psr-4": {
+      "Yangyifan\\Model\\": "./src"
+    }
+  }
+}
