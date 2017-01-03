@@ -2,6 +2,8 @@
 
 namespace Yangyifan\Model;
 
+use Closure;
+use MongoDB\BSON\ObjectID;
 use Yangyifan\Library\UtilityLibrary;
 
 trait TransFormModelHelper
@@ -25,6 +27,17 @@ trait TransFormModelHelper
     }
 
     /**
+     *  获取 transFormFields 之前需要执行的方法
+     *
+     * @author @author yangyifan <yangyifanphp@gmail.com>
+     * @return Closure
+     */
+    protected function getTransFormBeforeEvent()
+    {
+        return function(){};
+    }
+
+    /**
      * 根据 $transFields 转换字段
      *
      * @param array|null $transFields
@@ -38,6 +51,9 @@ trait TransFormModelHelper
             return [];
         }
 
+        // 判断 transFormFields 之前需要执行的方法, 如果有则触发事件。
+        $this->getTransFormBeforeEvent() instanceof Closure && call_user_func($this->getTransFormBeforeEvent());
+
         $data = [];
 
         foreach ( $transFields as $fieldKey => $fieldValue ) {
@@ -47,9 +63,9 @@ trait TransFormModelHelper
                 && $this->getOriginal($fieldKey)
                     ? $this->getAttribute($fieldValue)
                     :   ( $this->hasGetMutator($fieldKey)
-                            ? $this->mutateAttribute($fieldKey, $this->parseFields($fieldValue) )
-                            : ''
-                        );
+                    ? $this->mutateAttribute($fieldKey, $this->parseFields($fieldValue) )
+                    : ''
+                );
         }
 
         unset($fieldKey);
@@ -69,11 +85,14 @@ trait TransFormModelHelper
         if ( is_array($field) ) {
 
             array_walk($field, function(&$item){
-                $item = $this->{$item};
+                $item = $this->getOriginal($item);
             });
+
             return $field;
         }
 
-        return $this->{$field};
+        $field = $this->getOriginal($field);
+
+        return $field instanceof ObjectID ? static::toStringId($field) : $field;
     }
 }
