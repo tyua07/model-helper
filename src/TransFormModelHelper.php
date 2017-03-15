@@ -64,7 +64,7 @@ trait TransFormModelHelper
                     ? $this->getAttribute($fieldValue)
                     :   ( $this->hasGetMutator($fieldKey)
                     ? $this->mutateAttribute($fieldKey, $this->parseFields($fieldValue) )
-                    : ''
+                    : $this->getAttribute($fieldValue)
                 );
         }
 
